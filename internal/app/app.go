@@ -9,6 +9,7 @@ import (
 
 	"github.com/houseofaragon/go_project/internal/api"
 	"github.com/houseofaragon/go_project/internal/store"
+	"github.com/houseofaragon/go_project/migrations"
 )
 
 type Application struct {
@@ -20,10 +21,17 @@ type Application struct {
 // Creates a new app
 // returning pointer to Application and error
 func NewApplication() (*Application, error) {
+
 	// add db
 	pgDB, err := store.Open()
 	if err != nil {
 		return nil, err
+	}
+
+	// add migrations
+	err = store.MigrateFS(pgDB, migrations.FS, ".")
+	if err != nil {
+		panic(err)
 	}
 
 	// add logger
